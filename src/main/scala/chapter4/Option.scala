@@ -61,53 +61,53 @@ object Option {
     }
     go(a, Nil)
   }
-  
+
   // recursive version with flatMap and map
   def sequence2[A](a: List[Option[A]]): Option[List[A]] = a match {
     case Nil => Some(Nil)
-    case x :: xs => x flatMap (xx => sequence2(xs) map (xx :: _))    
+    case x :: xs => x flatMap (xx => sequence2(xs) map (xx :: _))
   }
-  
+
   // version with foldRight
   def sequence3[A](a: List[Option[A]]): Option[List[A]] =
-    a.foldRight[Option[List[A]]](Some(Nil))((x,y) => map2(x,y)(_ :: _))
-    
+    a.foldRight[Option[List[A]]](Some(Nil))((x, y) => map2(x, y)(_ :: _))
+
   // version with for comprehensions
   def sequence4[A](a: List[Option[A]]): Option[List[A]] = a match {
     case Nil => Some(Nil)
     case x :: xs => {
       for {
         aa <- x
-        bb <- sequence4(xs) 
+        bb <- sequence4(xs)
       } yield aa :: bb
-    }    
+    }
   }
-  
+
   // trivial implementation with sequence and map
-  def traverse1[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = sequence(a map f)  
-  
+  def traverse1[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = sequence(a map f)
+
   // recursive version with flatMap and map
   // also we're playing here with partial applied funtions
-  def traverse2[A,B](f: A => Option[B])(a: List[A]): Option[List[B]] = {
+  def traverse2[A, B](f: A => Option[B])(a: List[A]): Option[List[B]] = {
     val tr = traverse2(f) _
     a match {
-        case Nil => Some(Nil)
-        case x :: xs => f(x) flatMap (xx => tr(xs) map (xx :: _))    
-    } 
-}
-  
+      case Nil => Some(Nil)
+      case x :: xs => f(x) flatMap (xx => tr(xs) map (xx :: _))
+    }
+  }
+
   // version with foldRight
-  def traverse3[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = 
-    a.foldRight[Option[List[B]]](Some(Nil))((x,y) => map2(f(x),y)(_ :: _))
-  
+  def traverse3[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+    a.foldRight[Option[List[B]]](Some(Nil))((x, y) => map2(f(x), y)(_ :: _))
+
   // version with for comprehensions 
-  def traverse[A,B](a: List[A])(f: A => Option[B]): Option[List[B]] = a match {
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = a match {
     case Nil => Some(Nil)
     case x :: xs => {
       for {
         aa <- f(x)
-        bb <- traverse(xs)(f) 
+        bb <- traverse(xs)(f)
       } yield aa :: bb
-    }    
+    }
   }
 }
